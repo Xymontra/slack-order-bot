@@ -1,11 +1,33 @@
 <?php
-file_put_contents('debug.txt', json_encode($_POST) . PHP_EOL, FILE_APPEND);
+
+function isValidSlackRequest($config) {
+    $timestamp = $_SERVER['HTTP_X_SLACK_REQUEST_TIMESTAMP'] ?? '';
+    $signature = $_SERVER['HTTP_X_SLACK_SIGNATURE'] ?? '';
+
+    // 5 dakikadan eskiyse reddet (Replay attack koruması)
+    if (abs(time() - (int)$timestamp) > 60 * 5) {
+        return false;
+    }
+
+    $reqBody = file_get_contents('php://input');
+    $baseString = "v0:$timestamp:$reqBody";
+    $computedSig = 'v0=' . hash_hmac('sha256', $baseString, $config['slack_signing_secret']);
+
+    return hash_equals($computedSig, $signature);
+}
+
 $config = require 'config.php';
 require 'Api.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit('Method Not Allowed');
+}
+
+if (!isValidSlackRequest($config)) {
+    http_response_code(403);
+    echo "❌ Geçersiz Slack imzası.";
+    exit;
 }
 
 $command     = $_POST['command']     ?? '';

@@ -1,7 +1,8 @@
 <?php
 
 return [
-
+    // This is the Slack bot token for authentication.
+    'slack_signing_secret' => getenv('SLACK_SIGNING_SECRET'),
     // This is the channel ID where the bot will respond to commands.
     'allowed_channel' => getenv('ALLOWED_CHANNEL_ID'),
     // This is the URL of the API endpoint.
