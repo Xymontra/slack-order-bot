@@ -13,7 +13,7 @@ return [
     ],
     // This is the R2D service ID for drip-feed.
     'hikaye_services' => [
-        'TR'     => 6297,
+        'TR'     => 6287,
         'GLOBAL' => 5343,
         'AZE'    => 6713
     ],
